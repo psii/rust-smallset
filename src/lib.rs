@@ -9,7 +9,7 @@ use std::fmt;
 use std::iter::FromIterator;
 
 extern crate smallvec;
-use smallvec::{Array, SmallVec};
+use smallvec::{Array, SmallVec, Drain};
 
 /// A `SmallSet` is an unordered set of elements. It is designed to work best
 /// for very small sets (no more than ten or so elements). In order to support
@@ -83,6 +83,10 @@ impl<A: Array> SmallSet<A>
     /// an arbitrary (unsorted) order.
     pub fn iter(&self) -> Iter<A::Item> {
         self.elements.iter()
+    }
+
+    pub fn drain(&mut self) -> Drain<A::Item> {
+        self.elements.drain()
     }
 
     /// Returns the current length of the set.
