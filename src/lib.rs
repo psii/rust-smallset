@@ -6,6 +6,7 @@
 
 use std::slice::Iter;
 use std::fmt;
+use std::iter::FromIterator;
 
 extern crate smallvec;
 use smallvec::{Array, SmallVec};
@@ -103,6 +104,18 @@ impl<A: Array> Clone for SmallSet<A>
     }
 }
 
+impl<A: Array> FromIterator<A::Item> for SmallSet<A>
+    where A::Item: PartialEq + Eq
+{
+    fn from_iter<I: IntoIterator<Item=A::Item>>(iterable: I) -> SmallSet<A> {
+        let mut v = SmallSet::new();
+        for elem in iterable {
+            v.insert(elem);
+        }
+        v
+    }
+}
+
 impl<A: Array> fmt::Debug for SmallSet<A>
     where A::Item: PartialEq + Eq + fmt::Debug
 {
@@ -148,6 +161,12 @@ mod test {
         assert!(!s.contains(&1));
         assert!(s.insert(1) == true);
         assert!(s.iter().map(|r| *r).collect::<Vec<u32>>() == vec![2, 1]);
+    }
+
+    #[test]
+    fn test_from_iter() {
+        let s: SmallSet<[u32; 2]> = [2, 3, 2, 2].iter().cloned().collect();
+        assert!(s.iter().cloned().collect::<Vec<u32>>() == vec![2, 3]);
     }
 
     #[test]
